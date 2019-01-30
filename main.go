@@ -101,6 +101,7 @@ func (conn *APIConnection) makeAPIRequest(r apirequest) []byte {
 	cli := &http.Client{}
 	resp, _ := cli.Do(req)
 	body, _ := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
 	return body
 }
 
