@@ -48,6 +48,7 @@ type Transaction struct {
 	OtherAccountNumber string  `json:"otherAccountNumber"`
 	Amount             float64 `json:"amount"`
 	Text               string  `json:"text"`
+	Source             string  `json:"source"`
 }
 
 type transactions struct {
