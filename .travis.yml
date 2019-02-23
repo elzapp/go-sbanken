@@ -1,4 +1,7 @@
 dist: trusty
+language: go
+go:
+  - 1.x
 addons:
   sonarcloud:
     organization: "elzapp-github" # the key of the org you chose at step #3
