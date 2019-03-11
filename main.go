@@ -10,8 +10,8 @@ import (
 )
 
 const identityserver = "https://auth.sbanken.no/IdentityServer/connect/token"
-const api_accounts = "https://api.sbanken.no/Bank/api/v1/Accounts"
-const api_transactions = "https://api.sbanken.no/Bank/api/v1/Transactions/%s"
+const apiAccounts = "https://api.sbanken.no/Bank/api/v1/Accounts"
+const apiTransactions = "https://api.sbanken.no/Bank/api/v1/Transactions/%s"
 
 type accounts struct {
 	Accounts []Account `json:"items"`
@@ -61,7 +61,7 @@ type APIConnection struct {
 	token string
 }
 
-func (conn *APIConnection) GetToken() string {
+func (conn *APIConnection) getToken() string {
 	if conn.token == "" {
 		postdata := url.Values{}
 		postdata.Add("grant_type", "client_credentials")
@@ -84,7 +84,7 @@ type apirequest struct {
 	headers map[string]string
 }
 
-func newApiRequest() apirequest {
+func newAPIRequest() apirequest {
 	var r apirequest
 	r.params = map[string]string{}
 	r.headers = map[string]string{}
@@ -93,7 +93,7 @@ func newApiRequest() apirequest {
 
 func (conn *APIConnection) makeAPIRequest(r apirequest) []byte {
 	req, _ := http.NewRequest("GET", r.target, nil)
-	req.Header.Add("Authorization", "Bearer "+conn.GetToken())
+	req.Header.Add("Authorization", "Bearer "+conn.getToken())
 
 	req.Header.Add("customerId", conn.cred.UserID)
 	for key, value := range r.headers {
@@ -107,16 +107,16 @@ func (conn *APIConnection) makeAPIRequest(r apirequest) []byte {
 }
 
 func (conn *APIConnection) GetAccounts() []Account {
-	r := newApiRequest()
-	r.target = api_accounts
+	r := newAPIRequest()
+	r.target = apiAccounts
 	var a accounts
 	json.Unmarshal(conn.makeAPIRequest(r), &a)
 	return a.Accounts
 }
 
 func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
-	r := newApiRequest()
-	r.target = fmt.Sprintf(api_transactions, accountid)
+	r := newAPIRequest()
+	r.target = fmt.Sprintf(apiTransactions, accountid)
 	var t transactions
 	json.Unmarshal(conn.makeAPIRequest(r), &t)
 	return t.Transactions
