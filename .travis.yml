@@ -2,6 +2,8 @@ dist: trusty
 language: go
 go:
   - 1.x
+install:
+  - go get github.com/golang/lint/golint
 addons:
   sonarcloud:
     organization: "elzapp-github" # the key of the org you chose at step #3
@@ -12,5 +14,6 @@ jobs:
     - stage: test
       script: 
         - go test -coverprofile=coverage.out -json > testreport.json
-        - sonar-scanner -D"sonar.projectKey=elzapp_go-sbanken" -D"sonar.go.coverage.reportPaths=coverage.out"
+        - $HOME/gopath/bin/golint > golint.out
+        - sonar-scanner -D"sonar.projectKey=elzapp_go-sbanken" -D"sonar.go.coverage.reportPaths=coverage.out" -D"sonar.go.golint.reportPaths=golint.out"
 
