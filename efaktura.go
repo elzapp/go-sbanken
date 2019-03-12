@@ -41,6 +41,7 @@ type eFakturaItemResponse struct {
 	errorInformation
 }
 
+// GetNewEfakturas returns eFakturas that has not been accepted yet
 func (conn *APIConnection) GetNewEfakturas() []EFaktura {
 	r := newAPIRequest()
 	r.target = newEfakturas
