@@ -18,6 +18,8 @@ type EFaktura struct {
 	CreditAccountNumber string  `json:"creditAccountNumber"`
 }
 
+// EFakturaPayRequest is used to accept an eFaktura, charging the AccountID
+// on the due date with the maximum or the minimun amount
 type EFakturaPayRequest struct {
 	EFakturaID           string `json:"eFakturaId"`
 	AccountID            string `json:"accountId"`
