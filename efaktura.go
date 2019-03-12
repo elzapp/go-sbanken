@@ -1,5 +1,10 @@
 package sbanken
 
+import "encoding/json"
+
+const newEfakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas/new"
+const efakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas"
+
 // EFaktura as received from the Sbanken public API
 type EFaktura struct {
 	EFakturaID          string  `json:"eFakturaId"`
@@ -34,4 +39,28 @@ type eFakturaListResponse struct {
 type eFakturaItemResponse struct {
 	Item EFaktura `json:"item"`
 	errorInformation
+}
+
+func (conn *APIConnection) GetNewEfakturas() []EFaktura {
+	r := newAPIRequest()
+	r.target = newEfakturas
+	var a eFakturaListResponse
+	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	return a.Items
+}
+
+func (conn *APIConnection) GetAllEfakturas() []EFaktura {
+	r := newAPIRequest()
+	r.target = efakturas
+	var a eFakturaListResponse
+	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	return a.Items
+}
+
+func (conn *APIConnection) GetEfaktura(efakturaId string) EFaktura {
+	r := newAPIRequest()
+	r.target = efakturas + "/" + efakturaId
+	var a eFakturaItemResponse
+	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	return a.Item
 }
