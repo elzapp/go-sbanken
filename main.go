@@ -67,8 +67,9 @@ type transactions struct {
 
 // APIConnection is the Api client
 type APIConnection struct {
-	cred  Credentials
-	token string
+	cred           Credentials
+	token          string
+	makeAPIRequest func(r apirequest) []byte
 }
 
 func (conn *APIConnection) getToken() string {
@@ -101,21 +102,6 @@ func newAPIRequest() apirequest {
 	return r
 }
 
-func (conn *APIConnection) makeAPIRequest(r apirequest) []byte {
-	req, _ := http.NewRequest("GET", r.target, nil)
-	req.Header.Add("Authorization", "Bearer "+conn.getToken())
-
-	req.Header.Add("customerId", conn.cred.UserID)
-	for key, value := range r.headers {
-		req.Header.Add(key, value)
-	}
-	cli := &http.Client{Timeout: time.Second * 10}
-	resp, _ := cli.Do(req)
-	body, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	return body
-}
-
 func (conn *APIConnection) GetAccounts() []Account {
 	r := newAPIRequest()
 	r.target = apiAccounts
@@ -135,5 +121,19 @@ func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 func NewApiConnection(cred Credentials) APIConnection {
 	var conn APIConnection
 	conn.cred = cred
+	conn.makeAPIRequest = func(r apirequest) []byte {
+		req, _ := http.NewRequest("GET", r.target, nil)
+		req.Header.Add("Authorization", "Bearer "+conn.getToken())
+
+		req.Header.Add("customerId", conn.cred.UserID)
+		for key, value := range r.headers {
+			req.Header.Add(key, value)
+		}
+		cli := &http.Client{Timeout: time.Second * 10}
+		resp, _ := cli.Do(req)
+		body, _ := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		return body
+	}
 	return conn
 }
