@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const identityserver = "https://auth.sbanken.no/IdentityServer/connect/token"
@@ -108,7 +109,7 @@ func (conn *APIConnection) makeAPIRequest(r apirequest) []byte {
 	for key, value := range r.headers {
 		req.Header.Add(key, value)
 	}
-	cli := &http.Client{}
+	cli := &http.Client{Timeout: time.Second * 10}
 	resp, _ := cli.Do(req)
 	body, _ := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
