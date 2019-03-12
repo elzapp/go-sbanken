@@ -1,6 +1,8 @@
 package sbanken
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetAccounts(t *testing.T) {
 	var cred Credentials
@@ -119,6 +121,28 @@ const efakturaList = `{
 	"errorMessage": "string",
 	"traceId": "string"
   }`
+const singleEFaktura = `{
+	"item": {
+	  "eFakturaId": "XXXYZXYZ",
+	  "issuerId": "a",
+	  "eFakturaReference": "b",
+	  "documentType": "c",
+	  "status": "d",
+	  "kid": "e",
+	  "originalDueDate": "2019-03-12T20:44:24.879Z",
+	  "originalAmount": 100,
+	  "minimumAmount": 10,
+	  "updatedDueDate": "2019-03-12T20:44:24.879Z",
+	  "updatedAmount": 30,
+	  "notificationDate": "2019-03-12T20:44:24.879Z",
+	  "creditAccountNumber": "x",
+	  "issuerName": "Telenor"
+	},
+	"errorType": "System",
+	"isError": true,
+	"errorMessage": "string",
+	"traceId": "string"
+  }`
 
 func TestGetNewEfakturas(t *testing.T) {
 	var cred Credentials
@@ -133,5 +157,42 @@ func TestGetNewEfakturas(t *testing.T) {
 
 	if efakturas[0].EFakturaID != "XYZXYZ" {
 		t.Errorf("Expected efaktura id to be XYZXYZ, got %s", efakturas[0].EFakturaID)
+	}
+}
+func TestGetAllEfakturas(t *testing.T) {
+	var cred Credentials
+	conn := NewApiConnection(cred)
+	conn.makeAPIRequest = func(r apirequest) []byte {
+		if r.target != "https://api.sbanken.no/Bank/api/v1/EFakturas" {
+			t.Errorf("GetAllEFakturas is calling wrong endpoint: %s", r.target)
+		}
+		return []byte(efakturaList)
+	}
+	efakturas := conn.GetAllEfakturas()
+	if len(efakturas) != 1 {
+		t.Errorf("Expected number of returned transactions to be 1, got %d", len(efakturas))
+	}
+
+	if efakturas[0].EFakturaID != "XYZXYZ" {
+		t.Errorf("Expected efaktura id to be XYZXYZ, got %s", efakturas[0].EFakturaID)
+	}
+}
+
+func TestGetSingleEFaktura(t *testing.T) {
+	var cred Credentials
+	conn := NewApiConnection(cred)
+	conn.makeAPIRequest = func(r apirequest) []byte {
+		if r.target != "https://api.sbanken.no/Bank/api/v1/EFakturas/XYZXYZ" {
+			t.Errorf("GetEfaktura is calling wrong endpoint: %s", r.target)
+		}
+		return []byte(singleEFaktura)
+	}
+	efaktura := conn.GetEfaktura("XYZXYZ")
+
+	if efaktura.EFakturaID != "XXXYZXYZ" {
+		t.Errorf("Expected efaktura id to be XXXYZXYZ, got %s", efaktura.EFakturaID)
+	}
+	if efaktura.IssuerName != "Telenor" {
+		t.Errorf("Expected issuer name to be Telenor, got %s", efaktura.IssuerName)
 	}
 }

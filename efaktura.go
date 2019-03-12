@@ -19,7 +19,7 @@ type EFaktura struct {
 	NotificationDate    string  `json:"notificationDate"`
 	IssuerName          string  `json:"issuerName"`
 	UpdatedDueDate      string  `json:"updatedDueDate"`
-	UpdatedAmount       string  `json:"updatedAmount"`
+	UpdatedAmount       float64 `json:"updatedAmount"`
 	CreditAccountNumber string  `json:"creditAccountNumber"`
 }
 
