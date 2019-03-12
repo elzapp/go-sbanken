@@ -10,7 +10,7 @@ addons:
 jobs:
   include:
     - name: test
-    - script: go test -coverprofile=coverage.out -json > testreport.json
+      script: go test -coverprofile=coverage.out -json > testreport.json
     - name: analyze
-    - script: sonar-scanner -D"sonar.projectKey=elzapp_go-sbanken" -D"sonar.go.coverage.reportPaths=coverage.out"
+      script: sonar-scanner -D"sonar.projectKey=elzapp_go-sbanken" -D"sonar.go.coverage.reportPaths=coverage.out"
 
