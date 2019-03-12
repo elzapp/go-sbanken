@@ -3,7 +3,7 @@ language: go
 go:
   - 1.x
 install:
-  - go get github.com/golang/lint/golint
+  - go get golang.org/x/lint/golint
 addons:
   sonarcloud:
     organization: "elzapp-github" # the key of the org you chose at step #3
