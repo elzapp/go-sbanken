@@ -93,6 +93,45 @@ func TestGetTransactions(t *testing.T) {
 	}
 
 	if transactions[0].AccountingDate != "2019-03-12T20:15:12.477Z" {
-		t.Errorf("Expected number of returned accounts to be 2019-03-12T20:15:12.477Z, got %s", transactions[0].AccountingDate)
+		t.Errorf("Expected accounting date to be 2019-03-12T20:15:12.477Z, got %s", transactions[0].AccountingDate)
+	}
+}
+
+const efakturaList = `{
+	"availableItems": 0,
+	"items": [
+	  {
+		"eFakturaId": "XYZXYZ",
+		"issuerId": "string",
+		"eFakturaReference": "string",
+		"documentType": "string",
+		"status": "string",
+		"kid": "string",
+		"originalDueDate": "2019-03-12T20:30:21.730Z",
+		"originalAmount": 0,
+		"minimumAmount": 0,
+		"notificationDate": "2019-03-12T20:30:21.730Z",
+		"issuerName": "string"
+	  }
+	],
+	"errorType": "System",
+	"isError": true,
+	"errorMessage": "string",
+	"traceId": "string"
+  }`
+
+func TestGetNewEfakturas(t *testing.T) {
+	var cred Credentials
+	conn := NewApiConnection(cred)
+	conn.makeAPIRequest = func(r apirequest) []byte {
+		return []byte(efakturaList)
+	}
+	efakturas := conn.GetNewEfakturas()
+	if len(efakturas) != 1 {
+		t.Errorf("Expected number of returned transactions to be 1, got %d", len(efakturas))
+	}
+
+	if efakturas[0].EFakturaID != "XYZXYZ" {
+		t.Errorf("Expected efaktura id to be XYZXYZ, got %s", efakturas[0].EFakturaID)
 	}
 }
