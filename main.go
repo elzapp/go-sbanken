@@ -15,6 +15,7 @@ const apiTransactions = "https://api.sbanken.no/Bank/api/v1/Transactions/%s"
 
 type accounts struct {
 	Accounts []Account `json:"items"`
+	errorInformation
 }
 
 // Account information
@@ -27,6 +28,13 @@ type Account struct {
 	Available       float64 `json:"available"`
 	Balance         float64 `json:"balance"`
 	CreditLimit     float64 `json:"creditLimit"`
+}
+
+type errorInformation struct {
+	IsError      bool   `json:"isError"`
+	ErrorType    string `json:"errorType"`
+	ErrorMessage string `json:"errorMessage"`
+	TraceID      string `json:"traceId"`
 }
 
 // Credentials holds login information
@@ -53,6 +61,7 @@ type Transaction struct {
 
 type transactions struct {
 	Transactions []Transaction `json:"items"`
+	errorInformation
 }
 
 // APIConnection is the Api client
