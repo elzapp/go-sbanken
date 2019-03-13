@@ -41,8 +41,8 @@ type eFakturaItemResponse struct {
 	errorInformation
 }
 
-// GetNewEfakturas returns eFakturas that has not been accepted yet
-func (conn *APIConnection) GetNewEfakturas() []EFaktura {
+// GetNewEFakturas returns eFakturas that has not been accepted yet
+func (conn *APIConnection) GetNewEFakturas() []EFaktura {
 	r := newAPIRequest()
 	r.target = newEfakturas
 	var a eFakturaListResponse
@@ -50,7 +50,8 @@ func (conn *APIConnection) GetNewEfakturas() []EFaktura {
 	return a.Items
 }
 
-func (conn *APIConnection) GetAllEfakturas() []EFaktura {
+// GetAllEFakturas returns all pending eFakturas
+func (conn *APIConnection) GetAllEFakturas() []EFaktura {
 	r := newAPIRequest()
 	r.target = efakturas
 	var a eFakturaListResponse
@@ -58,9 +59,10 @@ func (conn *APIConnection) GetAllEfakturas() []EFaktura {
 	return a.Items
 }
 
-func (conn *APIConnection) GetEfaktura(efakturaId string) EFaktura {
+// GetEFaktura returns information on a single EFaktura specified by eFakturaID
+func (conn *APIConnection) GetEFaktura(eFakturaID string) EFaktura {
 	r := newAPIRequest()
-	r.target = efakturas + "/" + efakturaId
+	r.target = efakturas + "/" + eFakturaID
 	var a eFakturaItemResponse
 	json.Unmarshal(conn.makeAPIRequest(r), &a)
 	return a.Item
