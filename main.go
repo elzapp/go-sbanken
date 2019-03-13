@@ -102,6 +102,8 @@ func newAPIRequest() apirequest {
 	return r
 }
 
+// GetAccounts returns a list of all your bank accounts
+// See the Account struct for details
 func (conn *APIConnection) GetAccounts() []Account {
 	r := newAPIRequest()
 	r.target = apiAccounts
@@ -110,6 +112,8 @@ func (conn *APIConnection) GetAccounts() []Account {
 	return a.Accounts
 }
 
+// GetTransactions returns the latest transactions on a given account
+// using the default limits set by Sbanken
 func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 	r := newAPIRequest()
 	r.target = fmt.Sprintf(apiTransactions, accountid)
@@ -118,7 +122,14 @@ func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 	return t.Transactions
 }
 
-func NewApiConnection(cred Credentials) APIConnection {
+// NewAPIConnection creates an API connection for you
+// This is your starting point, supply it with a
+// Credentials struct, which you easily can read from a
+// JSON file.
+//
+// The returned APIConnection struct contains all the
+// methods to communicate with the public Sbanken API
+func NewAPIConnection(cred Credentials) APIConnection {
 	var conn APIConnection
 	conn.cred = cred
 	conn.makeAPIRequest = func(r apirequest) []byte {
