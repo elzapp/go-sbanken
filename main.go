@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+const dateFormat = "2006-01-02T15:04:05.000Z" //2019-03-12T20:15:12.477Z
 const identityserver = "https://auth.sbanken.no/IdentityServer/connect/token"
 const apiAccounts = "https://api.sbanken.no/Bank/api/v1/Accounts"
 const apiTransactions = "https://api.sbanken.no/Bank/api/v1/Transactions/%s"
@@ -58,6 +59,18 @@ type Transaction struct {
 	Amount             float64 `json:"amount"`
 	Text               string  `json:"text"`
 	Source             string  `json:"source"`
+}
+
+// GetInterestDate returns the interest date as a Time struct
+func (t *Transaction) GetInterestDate() time.Time {
+	r, _ := time.Parse(dateFormat, t.InterestDate)
+	return r
+}
+
+// GetAccountingDate returns the interest date as a Time struct
+func (t *Transaction) GetAccountingDate() time.Time {
+	r, _ := time.Parse(dateFormat, t.AccountingDate)
+	return r
 }
 
 type transactions struct {
