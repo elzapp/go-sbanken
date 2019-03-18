@@ -45,8 +45,8 @@ func TestGetTransactions(t *testing.T) {
 			"availableItems": 1,
 			"items": [
 			  {
-				"accountingDate": "2019-02-12T20:15:12.477Z",
-				"interestDate": "2019-03-12T20:15:12.477Z",
+				"accountingDate": "2019-03-06T00:00:00+01:00",
+				"interestDate": "2019-03-12T20:15:12+01:00",
 				"otherAccountNumber": "string",
 				"otherAccountNumberSpecified": true,
 				"amount": 0,
@@ -94,14 +94,14 @@ func TestGetTransactions(t *testing.T) {
 		t.Errorf("Expected number of returned transactions to be 1, got %d", len(transactions))
 	}
 
-	if transactions[0].AccountingDate != "2019-02-12T20:15:12.477Z" {
-		t.Errorf("Expected accounting date to be 2019-02-12T20:15:12.477Z, got %s", transactions[0].AccountingDate)
+	if transactions[0].AccountingDate != "2019-03-06T00:00:00+01:00" {
+		t.Errorf("Expected accounting date to be 2019-03-06T00:00:00+01:00, got %s", transactions[0].AccountingDate)
 	}
-	if transactions[0].GetAccountingDate().Unix() != 1550002512 {
-		t.Errorf("Expected accounting date to be %d, got %d", 1550002512, transactions[0].GetAccountingDate().Unix())
+	if transactions[0].GetAccountingDate().Unix() != 1551826800 {
+		t.Errorf("Expected accounting date to be %d, got %d", 1551826800, transactions[0].GetAccountingDate().Unix())
 	}
-	if transactions[0].GetInterestDate().Unix() != 1552421712 {
-		t.Errorf("Expected interest date to be %d, got %d", 1552421712, transactions[0].GetInterestDate().Unix())
+	if transactions[0].GetInterestDate().Unix() != 1552418112 {
+		t.Errorf("Expected interest date to be %d, got %d", 1552418112, transactions[0].GetInterestDate().Unix())
 	}
 }
 

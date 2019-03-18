@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const dateFormat = "2006-01-02T15:04:05.000Z" //2019-03-12T20:15:12.477Z
+const dateFormat = "2006-01-02T15:04:05-07:00" //2019-03-06T00:00:00+01:00
 const identityserver = "https://auth.sbanken.no/IdentityServer/connect/token"
 const apiAccounts = "https://api.sbanken.no/Bank/api/v1/Accounts"
 const apiTransactions = "https://api.sbanken.no/Bank/api/v1/Transactions/%s"
