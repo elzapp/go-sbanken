@@ -93,7 +93,11 @@ func (conn *APIConnection) getToken() string {
 		req.Header.Add("Content-type", "application/x-www-form-urlencoded; charset=utf-8")
 		req.SetBasicAuth(conn.cred.Apikey, conn.cred.Secret)
 		cli := &http.Client{}
-		resp, _ := cli.Do(req)
+		resp, err := cli.Do(req)
+		if err != nil {
+			return ""
+		}
+		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		var t tokenResponse
 		json.Unmarshal(body, &t)
@@ -154,9 +158,12 @@ func NewAPIConnection(cred Credentials) APIConnection {
 			req.Header.Add(key, value)
 		}
 		cli := &http.Client{Timeout: time.Second * 10}
-		resp, _ := cli.Do(req)
+		resp, err := cli.Do(req)
+		if err != nil {
+			return []byte("")
+		}
 		body, _ := ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
+		defer resp.Body.Close()
 		return body
 	}
 	return conn
