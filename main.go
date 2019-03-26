@@ -159,12 +159,12 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		}
 		cli := &http.Client{Timeout: time.Second * 10}
 		resp, err := cli.Do(req)
-		if err != nil {
-			return []byte("")
+		if err == nil {
+			defer resp.Body.Close()
+			body, _ := ioutil.ReadAll(resp.Body)
+			return body
 		}
-		body, _ := ioutil.ReadAll(resp.Body)
-		defer resp.Body.Close()
-		return body
+		return []byte{}
 	}
 	return conn
 }
