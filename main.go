@@ -85,18 +85,28 @@ type APIConnection struct {
 	makeAPIRequest func(r apirequest) []byte
 }
 
+func (conn *APIConnection) HasToken() bool {
+	if conn.token == "" {
+		return false
+	}
+	return true
+}
+
 func (conn *APIConnection) getToken() string {
 	if conn.token == "" {
 		postdata := url.Values{}
 		postdata.Add("grant_type", "client_credentials")
 		req, _ := http.NewRequest("POST", identityserver, strings.NewReader(postdata.Encode()))
 		req.Header.Add("Content-type", "application/x-www-form-urlencoded; charset=utf-8")
+		req.Header.Add("User-Agent", "github.com/elzapp/go-sbanken")
 		req.SetBasicAuth(conn.cred.Apikey, conn.cred.Secret)
 		cli := &http.Client{}
 		resp, err := cli.Do(req)
 		if err != nil {
+			fmt.Printf("%+v", err)
 			return ""
 		}
+		fmt.Printf("%+v", resp)
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		var t tokenResponse
@@ -150,8 +160,10 @@ func NewAPIConnection(cred Credentials) APIConnection {
 	var conn APIConnection
 	conn.cred = cred
 	conn.makeAPIRequest = func(r apirequest) []byte {
+		token := conn.getToken()
 		req, _ := http.NewRequest("GET", r.target, nil)
-		req.Header.Add("Authorization", "Bearer "+conn.getToken())
+		req.Header.Add("Authorization", "Bearer "+token)
+		req.Header.Add("User-Agent", "github.com/elzapp/go-sbanken")
 
 		req.Header.Add("customerId", conn.cred.UserID)
 		for key, value := range r.headers {
@@ -162,7 +174,11 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		if err == nil {
 			defer resp.Body.Close()
 			body, _ := ioutil.ReadAll(resp.Body)
+			fmt.Println(string(body))
 			return body
+		} else {
+
+			fmt.Printf("%+v %d\n", r, resp.StatusCode)
 		}
 		return []byte{}
 	}
