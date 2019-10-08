@@ -11,9 +11,9 @@ import (
 )
 
 const dateFormat = "2006-01-02T15:04:05-07:00" //2019-03-06T00:00:00+01:00
-const identityserver = "https://auth.sbanken.no/IdentityServer/connect/token"
-const apiAccounts = "https://api.sbanken.no/Bank/api/v1/Accounts"
-const apiTransactions = "https://api.sbanken.no/Bank/api/v1/Transactions/%s"
+const identityserver = "https://auth.sbanken.no/identityserver/connect/token"
+const apiAccounts = "https://api.sbanken.no/exec.bank/api/v1/Accounts"
+const apiTransactions = "https://api.sbanken.no/exec.bank/api/v1/Transactions/%s"
 
 type accounts struct {
 	Accounts []Account `json:"items"`
@@ -176,10 +176,8 @@ func NewAPIConnection(cred Credentials) APIConnection {
 			body, _ := ioutil.ReadAll(resp.Body)
 			fmt.Println(string(body))
 			return body
-		} else {
-
-			fmt.Printf("%+v %d\n", r, resp.StatusCode)
 		}
+		fmt.Printf("\n\n%+v %d\n", r, resp.StatusCode)
 		return []byte{}
 	}
 	return conn
