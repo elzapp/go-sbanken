@@ -99,7 +99,7 @@ func (conn *APIConnection) getToken() string {
 		req, _ := http.NewRequest("POST", identityserver, strings.NewReader(postdata.Encode()))
 		req.Header.Add("Content-type", "application/x-www-form-urlencoded; charset=utf-8")
 		req.Header.Add("User-Agent", "github.com/elzapp/go-sbanken")
-		req.SetBasicAuth(conn.cred.Apikey, conn.cred.Secret)
+		req.SetBasicAuth(conn.cred.Apikey, url.QueryEscape(conn.cred.Secret))
 		cli := &http.Client{}
 		resp, err := cli.Do(req)
 		if err != nil {
