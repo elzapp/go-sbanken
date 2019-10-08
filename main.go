@@ -149,6 +149,19 @@ func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 	return t.Transactions
 }
 
+func (conn *APIConnection) GetTransactionsSince(accountid string, startDate string) []Transaction {
+	r := newAPIRequest()
+	r.target = fmt.Sprintf(apiTransactions, accountid)
+	sd := time.Now()
+	sd = sd.AddDate(-1, 0, 0)
+	r.params["startDate"] = sd.Format("2006-01-02")
+	r.params["length"] = "1000"
+
+	var t transactions
+	json.Unmarshal(conn.makeAPIRequest(r), &t)
+	return t.Transactions
+}
+
 // NewAPIConnection creates an API connection for you
 // This is your starting point, supply it with a
 // Credentials struct, which you easily can read from a
@@ -168,6 +181,14 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		req.Header.Add("customerId", conn.cred.UserID)
 		for key, value := range r.headers {
 			req.Header.Add(key, value)
+		}
+		fmt.Println(req.Header)
+		if len(r.params) > 0 {
+			q := req.URL.Query()
+			for key, value := range r.params {
+				q.Add(key, value)
+			}
+			req.URL.RawQuery = q.Encode()
 		}
 		cli := &http.Client{Timeout: time.Second * 10}
 		resp, err := cli.Do(req)
