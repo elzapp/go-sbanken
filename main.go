@@ -85,6 +85,7 @@ type APIConnection struct {
 	makeAPIRequest func(r apirequest) []byte
 }
 
+// Returns true if this session has been authenticated
 func (conn *APIConnection) HasToken() bool {
 	if conn.token == "" {
 		return false
@@ -149,6 +150,10 @@ func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 	return t.Transactions
 }
 
+// GetTransactions returns the latest transactions on a given account
+// for a given period. The period must be less than, or equal to 366 days.
+// At this point this will only return the last 1000 transactions in the
+// period
 func (conn *APIConnection) GetTransactionsSince(accountid string, startDate string) []Transaction {
 	r := newAPIRequest()
 	r.target = fmt.Sprintf(apiTransactions, accountid)
