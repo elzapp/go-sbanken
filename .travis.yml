@@ -15,5 +15,5 @@ jobs:
       script: 
         - go test -coverprofile=coverage.out -json > testreport.json
         - $HOME/gopath/bin/golint > golint.out
-        - sonar-scanner -D"sonar.projectKey=elzapp_go-sbanken" -D"sonar.go.coverage.reportPaths=coverage.out" -D"sonar.go.golint.reportPaths=golint.out"
+          #        - sonar-scanner -D"sonar.projectKey=elzapp_go-sbanken" -D"sonar.go.coverage.reportPaths=coverage.out" -D"sonar.go.golint.reportPaths=golint.out"
 
