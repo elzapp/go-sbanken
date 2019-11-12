@@ -52,13 +52,32 @@ type tokenResponse struct {
 
 // Transaction information
 type Transaction struct {
-	TransactionID      string  `json:"transactionId"`
-	AccountingDate     string  `json:"accountingDate"`
-	InterestDate       string  `json:"interestDate"`
-	OtherAccountNumber string  `json:"otherAccountNumber"`
-	Amount             float64 `json:"amount"`
-	Text               string  `json:"text"`
-	Source             string  `json:"source"`
+	TransactionID        string      `json:"transactionId"`
+	AccountingDate       string      `json:"accountingDate"`
+	InterestDate         string      `json:"interestDate"`
+	OtherAccountNumber   string      `json:"otherAccountNumber"`
+	TransactionType      string      `json:"transactionType"`
+	TransactionTypeCode  int64      `json:"transactionTypeCode"`
+	TransactionTypeText  string      `json:"transactionTypeText"`
+	IsReservation        bool        `json:"isReservation"`
+	CardDetailsSpecified bool        `json:"cardDetailsSpecified"`
+	Amount               float64     `json:"amount"`
+	Text                 string      `json:"text"`
+	Source               string      `json:"source"`
+	CardDetails          cardDetails `json:"cardDetails"`
+}
+
+type cardDetails struct {
+	CardNumber                  string  `json:"cardNumber"`
+	CurrencyAmount              float64 `json:"currencyAmount"`
+	CurrencyRate                float64 `json:"currencyRate"`
+	MerchantCategoryCode        string  `json:"merchantCategoryCode"`
+	MerchantCategoryDescription string  `json:"merchantCategoryDescription"`
+	MerchantCity                string  `json:"merchantCity"`
+	MerchantName                string  `json:"merchantName"`
+	OriginalCurrencyCode        string  `json:"originalCurrencyCode"`
+	PurchaseDate                string  `json:"purchaseDate"`
+	TransactionID               string  `json:"transactionId"`
 }
 
 // GetInterestDate returns the interest date as a Time struct
@@ -150,7 +169,7 @@ func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 	return t.Transactions
 }
 
-// GetTransactions returns the latest transactions on a given account
+// GetTransactionsSince returns the latest transactions on a given account
 // for a given period. The period must be less than, or equal to 366 days.
 // At this point this will only return the last 1000 transactions in the
 // period

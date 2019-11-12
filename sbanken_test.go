@@ -42,46 +42,50 @@ func TestGetTransactions(t *testing.T) {
 	conn := NewAPIConnection(cred)
 	conn.makeAPIRequest = func(r apirequest) []byte {
 		return []byte(`{
-			"availableItems": 1,
+			"availableItems": 2,
 			"items": [
 			  {
-				"accountingDate": "2019-03-06T00:00:00+01:00",
-				"interestDate": "2019-03-12T20:15:12+01:00",
-				"otherAccountNumber": "string",
-				"otherAccountNumberSpecified": true,
-				"amount": 0,
-				"text": "string",
-				"transactionType": "string",
-				"transactionTypeCode": 0,
-				"transactionTypeText": "string",
-				"isReservation": true,
-				"reservationType": "NotReservation",
-				"source": "AccountStatement",
-				"cardDetails": {
-				  "cardNumber": "string",
-				  "currencyAmount": 0,
-				  "currencyRate": 0,
-				  "merchantCategoryCode": "string",
-				  "merchantCategoryDescription": "string",
-				  "merchantCity": "string",
-				  "merchantName": "string",
-				  "originalCurrencyCode": "string",
-				  "purchaseDate": "2019-03-12T20:15:12.477Z",
-				  "transactionId": "string"
-				},
+				"accountingDate": "2019-10-14T00:00:00+02:00",
+				"interestDate": "2019-10-15T00:00:00+02:00",
+				"otherAccountNumberSpecified": false,
+				"amount": -58.000,
+				"text": "*3100 13.10 NOK 58.00 PAYPAL INC Kurs: 1.0000",
+				"transactionType": "VISA VARE",
+				"transactionTypeCode": 714,
+				"transactionTypeText": "VISA VARE",
+				"isReservation": false,
+				"reservationType": null,
+				"source": "Archive",
 				"cardDetailsSpecified": true,
-				"hasTransactionDetail": true,
-				"transactionDetail": {
-				  "formattedAccountNumber": "string",
-				  "transactionId": 0,
-				  "cid": "string",
-				  "amountDescription": "string",
-				  "receiverName": "string",
-				  "numericReference": 0,
-				  "payerName": "string",
-				  "registrationDate": "2019-03-12T20:15:12.477Z"
-				}
-			  }
+				"cardDetails": {
+					"cardNumber": "*3100",
+					"currencyAmount": 58.000,
+					"currencyRate": 1.00000,
+					"merchantCategoryCode": "5941",
+					"merchantCategoryDescription": "Sportsutstyr",
+					"merchantCity": "4029357733",
+					"merchantName": "PAYPAL *STRAVA INC",
+					"originalCurrencyCode": "NOK",
+					"purchaseDate": "2019-10-13T00:00:00+02:00",
+					"transactionId": "5892862195085990"
+				},
+				"transactionDetailSpecified": false
+			},
+			{
+				"accountingDate": "2019-10-23T00:00:00+02:00",
+				"interestDate": "2019-10-23T00:00:00+02:00",
+				"otherAccountNumberSpecified": false,
+				"amount": -16.410,
+				"text": "23.10 REMA SPECTRUM FOLKE BERNAD FYLLINGSDALEN",
+				"transactionType": "VARER",
+				"transactionTypeCode": 710,
+				"transactionTypeText": "VARER",
+				"isReservation": false,
+				"reservationType": null,
+				"source": "Archive",
+				"cardDetailsSpecified": false,
+				"transactionDetailSpecified": false
+			}
 			],
 			"errorType": "System",
 			"isError": true,
@@ -90,18 +94,23 @@ func TestGetTransactions(t *testing.T) {
 		  }`)
 	}
 	transactions := conn.GetTransactions("972219XXXXX")
-	if len(transactions) != 1 {
-		t.Errorf("Expected number of returned transactions to be 1, got %d", len(transactions))
+	if len(transactions) != 2 {
+		t.Errorf("Expected number of returned transactions to be 2, got %d", len(transactions))
 	}
-
-	if transactions[0].AccountingDate != "2019-03-06T00:00:00+01:00" {
-		t.Errorf("Expected accounting date to be 2019-03-06T00:00:00+01:00, got %s", transactions[0].AccountingDate)
+	if transactions[0].AccountingDate != "2019-10-14T00:00:00+02:00" {
+		t.Errorf("Expected accounting date to be 2019-10-14T00:00:00+02:00, got %s", transactions[0].AccountingDate)
 	}
-	if transactions[0].GetAccountingDate().Unix() != 1551826800 {
-		t.Errorf("Expected accounting date to be %d, got %d", 1551826800, transactions[0].GetAccountingDate().Unix())
+	if transactions[0].GetAccountingDate().Unix() != 1571004000 {
+		t.Errorf("Expected accounting date to be %d, got %d", 1571004000, transactions[0].GetAccountingDate().Unix())
 	}
-	if transactions[0].GetInterestDate().Unix() != 1552418112 {
-		t.Errorf("Expected interest date to be %d, got %d", 1552418112, transactions[0].GetInterestDate().Unix())
+	if transactions[0].GetInterestDate().Unix() != 1571090400 {
+		t.Errorf("Expected interest date to be %d, got %d", 1571090400, transactions[0].GetInterestDate().Unix())
+	}
+	if transactions[0].CardDetails.CardNumber != "*3100" {
+		t.Errorf("Expected cardNumber to be %s, but got %s", "*3100", transactions[0].CardDetails.CardNumber)
+	}
+	if transactions[1].Source != "Archive" {
+		t.Errorf("Expected Source on second tx to be %s, but got %s", "Archive", transactions[0].Source)
 	}
 }
 
