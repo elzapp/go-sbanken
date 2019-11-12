@@ -52,14 +52,35 @@ type tokenResponse struct {
 
 // Transaction information
 type Transaction struct {
-	TransactionID      string  `json:"transactionId"`
-	AccountingDate     string  `json:"accountingDate"`
-	InterestDate       string  `json:"interestDate"`
-	OtherAccountNumber string  `json:"otherAccountNumber"`
-	Amount             float64 `json:"amount"`
-	Text               string  `json:"text"`
-	Source             string  `json:"source"`
+	TransactionID       string  `json:"transactionId"`
+	AccountingDate      string  `json:"accountingDate"`
+	InterestDate        string  `json:"interestDate"`
+	OtherAccountNumber  string  `json:"otherAccountNumber"`
+	TransactionType     string  `json:"transactionType"`
+	TransactionTypeCode string  `json:"transactionTypeCode"`
+	TransactionTypeText string  `json:"transactionTypeText"`
+	IsReservation       bool    `json:"isReservation"`
+	CardDetailsSpecified bool    `json:"cardDetailsSpecified"`
+	Amount              float64 `json:"amount"`
+	Text                string  `json:"text"`
+	Source              string  `json:"source"`
+	CardDetails			cardDetails
+
 }
+
+type cardDetails struct {
+	CardNumber                  string  `json:"cardNumber"`
+	CurrencyAmount              float64 `json:"cardDetails.currencyAmount"`
+	currencyRate                float64 `json:"cardDetails.currencyRate"`
+	MerchantCategoryCode        string  `json:"cardDetails.merchantCategoryCode"`
+	MerchantCategoryDescription string  `json:"cardDetails.merchantCategoryDescription"`
+	MerchantCity                string  `json:"cardDetails.merchantCity"`
+	MerchantName                string  `json:"cardDetails.merchantName"`
+	OriginalCurrencyCode        string  `json:"cardDetails.originalCurrencyCode"`
+	PurchaseDate                string  `json:"cardDetails.purchaseDate"`
+	TransactionId               string  `json:"cardDetails.transactionId"`
+}
+
 
 // GetInterestDate returns the interest date as a Time struct
 func (t *Transaction) GetInterestDate() time.Time {
