@@ -22,7 +22,10 @@ func main() {
 	bconfig, _ := ioutil.ReadAll(configfile)
 	json.Unmarshal(bconfig, &creds)
 	connection := sbanken.NewAPIConnection(creds)
-	accounts := connection.GetAccounts()
+	accounts, err := connection.GetAccounts()
+	if err != nil {
+		log.Errorf("%s", err.Error())
+	}
 	fmt.Println("╔══ Account overview ══════════════════════════════════════════════╗")
 	fmt.Printf("║ %-25s%11s    % 10s    % 10s ║\n", "Name", "Number", "Balance", "Available")
 	for _, acc := range accounts {

@@ -28,7 +28,7 @@ func TestGetAccounts(t *testing.T) {
 			"traceId": "string"
 		  }`), nil
 	}
-	accounts := conn.GetAccounts()
+	accounts, _ := conn.GetAccounts()
 	if len(accounts) != 1 {
 		t.Errorf("Expected number of returned accounts to be 1, got %d", len(accounts))
 	}
@@ -93,7 +93,7 @@ func TestGetTransactions(t *testing.T) {
 			"traceId": "string"
 		  }`), nil
 	}
-	transactions := conn.GetTransactions("972219XXXXX")
+	transactions, _ := conn.GetTransactions("972219XXXXX")
 	if len(transactions) != 2 {
 		t.Errorf("Expected number of returned transactions to be 2, got %d", len(transactions))
 	}

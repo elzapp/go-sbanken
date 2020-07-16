@@ -163,27 +163,30 @@ func newAPIRequest() apirequest {
 
 // GetAccounts returns a list of all your bank accounts
 // See the Account struct for details
-func (conn *APIConnection) GetAccounts() []Account {
+func (conn *APIConnection) GetAccounts() ([]Account, error) {
 	r := newAPIRequest()
 	r.target = apiAccounts
 	var a accounts
 	resp, err := conn.makeAPIRequest(r)
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
 	json.Unmarshal(resp, &a)
-	return a.Accounts
+	return a.Accounts, nil
 }
 
 // GetTransactions returns the latest transactions on a given account
 // using the default limits set by Sbanken
-func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
+func (conn *APIConnection) GetTransactions(accountid string) ([]Transaction, error) {
 	r := newAPIRequest()
 	r.target = fmt.Sprintf(apiTransactions, accountid)
 	var t transactions
-	resp, _ := conn.makeAPIRequest(r)
+	resp, err := conn.makeAPIRequest(r)
+	if err != nil {
+		return nil, err
+	}
 	json.Unmarshal(resp, &t)
-	return t.Transactions
+	return t.Transactions, nil
 }
 
 // GetTransactionsSince returns the latest transactions on a given account
