@@ -7,7 +7,7 @@ import (
 func TestGetAccounts(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
-	conn.makeAPIRequest = func(r apirequest) []byte {
+	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
 		return []byte(`{
 			"availableItems": 1,
 			"items": [
@@ -26,7 +26,7 @@ func TestGetAccounts(t *testing.T) {
 			"isError": false,
 			"errorMessage": "string",
 			"traceId": "string"
-		  }`)
+		  }`), nil
 	}
 	accounts := conn.GetAccounts()
 	if len(accounts) != 1 {
@@ -40,7 +40,7 @@ func TestGetAccounts(t *testing.T) {
 func TestGetTransactions(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
-	conn.makeAPIRequest = func(r apirequest) []byte {
+	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
 		return []byte(`{
 			"availableItems": 2,
 			"items": [
@@ -91,7 +91,7 @@ func TestGetTransactions(t *testing.T) {
 			"isError": true,
 			"errorMessage": "string",
 			"traceId": "string"
-		  }`)
+		  }`), nil
 	}
 	transactions := conn.GetTransactions("972219XXXXX")
 	if len(transactions) != 2 {
@@ -162,8 +162,8 @@ const singleEFaktura = `{
 func TestGetNewEfakturas(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
-	conn.makeAPIRequest = func(r apirequest) []byte {
-		return []byte(efakturaList)
+	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
+		return []byte(efakturaList), nil
 	}
 	efakturas := conn.GetNewEFakturas()
 	if len(efakturas) != 1 {
@@ -177,11 +177,11 @@ func TestGetNewEfakturas(t *testing.T) {
 func TestGetAllEfakturas(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
-	conn.makeAPIRequest = func(r apirequest) []byte {
+	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
 		if r.target != "https://api.sbanken.no/Bank/api/v1/EFakturas" {
 			t.Errorf("GetAllEFakturas is calling wrong endpoint: %s", r.target)
 		}
-		return []byte(efakturaList)
+		return []byte(efakturaList), nil
 	}
 	efakturas := conn.GetAllEFakturas()
 	if len(efakturas) != 1 {
@@ -196,11 +196,11 @@ func TestGetAllEfakturas(t *testing.T) {
 func TestGetSingleEFaktura(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
-	conn.makeAPIRequest = func(r apirequest) []byte {
+	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
 		if r.target != "https://api.sbanken.no/Bank/api/v1/EFakturas/XYZXYZ" {
 			t.Errorf("GetEfaktura is calling wrong endpoint: %s", r.target)
 		}
-		return []byte(singleEFaktura)
+		return []byte(singleEFaktura), nil
 	}
 	efaktura := conn.GetEFaktura("XYZXYZ")
 
