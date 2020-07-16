@@ -2,8 +2,6 @@ package sbanken
 
 import (
 	"encoding/json"
-
-	log "github.com/sirupsen/logrus"
 )
 
 const newEfakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas/new"
@@ -46,26 +44,29 @@ type eFakturaItemResponse struct {
 }
 
 // GetNewEFakturas returns eFakturas that has not been accepted yet
-func (conn *APIConnection) GetNewEFakturas() []EFaktura {
+func (conn *APIConnection) GetNewEFakturas() ([]EFaktura, error) {
 	r := newAPIRequest()
 	r.target = newEfakturas
 	var a eFakturaListResponse
-	resp, _ := conn.makeAPIRequest(r)
+	resp, err := conn.makeAPIRequest(r)
+	if err != nil {
+		return nil, err
+	}
 	json.Unmarshal(resp, &a)
-	return a.Items
+	return a.Items, nil
 }
 
 // GetAllEFakturas returns all pending eFakturas
-func (conn *APIConnection) GetAllEFakturas() []EFaktura {
+func (conn *APIConnection) GetAllEFakturas() ([]EFaktura, error) {
 	r := newAPIRequest()
 	r.target = efakturas
 	var a eFakturaListResponse
 	resp, err := conn.makeAPIRequest(r)
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
 	json.Unmarshal(resp, &a)
-	return a.Items
+	return a.Items, nil
 }
 
 // GetEFaktura returns information on a single EFaktura specified by eFakturaID

@@ -165,7 +165,7 @@ func TestGetNewEfakturas(t *testing.T) {
 	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
 		return []byte(efakturaList), nil
 	}
-	efakturas := conn.GetNewEFakturas()
+	efakturas, _ := conn.GetNewEFakturas()
 	if len(efakturas) != 1 {
 		t.Errorf("Expected number of returned transactions to be 1, got %d", len(efakturas))
 	}
@@ -183,7 +183,7 @@ func TestGetAllEfakturas(t *testing.T) {
 		}
 		return []byte(efakturaList), nil
 	}
-	efakturas := conn.GetAllEFakturas()
+	efakturas, _ := conn.GetAllEFakturas()
 	if len(efakturas) != 1 {
 		t.Errorf("Expected number of returned transactions to be 1, got %d", len(efakturas))
 	}

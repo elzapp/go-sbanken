@@ -30,8 +30,12 @@ func main() {
 	}
 
 	fmt.Println("╚══════════════════════════════════════════════════════════════════╝")
-	efakturas := connection.GetAllEFakturas()
-	for _, ef := range efakturas {
-		fmt.Printf("%s", ef.IssuerName)
+	efakturas, err := connection.GetAllEFakturas()
+	if err != nil {
+		log.Errorf("%s", err.Error())
+	} else {
+		for _, ef := range efakturas {
+			fmt.Printf("%s", ef.IssuerName)
+		}
 	}
 }
