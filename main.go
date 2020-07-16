@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const dateFormat = "2006-01-02T15:04:05-07:00" //2019-03-06T00:00:00+01:00
@@ -57,7 +59,7 @@ type Transaction struct {
 	InterestDate         string      `json:"interestDate"`
 	OtherAccountNumber   string      `json:"otherAccountNumber"`
 	TransactionType      string      `json:"transactionType"`
-	TransactionTypeCode  int64      `json:"transactionTypeCode"`
+	TransactionTypeCode  int64       `json:"transactionTypeCode"`
 	TransactionTypeText  string      `json:"transactionTypeText"`
 	IsReservation        bool        `json:"isReservation"`
 	CardDetailsSpecified bool        `json:"cardDetailsSpecified"`
@@ -101,10 +103,10 @@ type transactions struct {
 type APIConnection struct {
 	cred           Credentials
 	token          string
-	makeAPIRequest func(r apirequest) []byte
+	makeAPIRequest func(r apirequest) ([]byte, error)
 }
 
-// Returns true if this session has been authenticated
+// HasToken returns true if this session has been authenticated
 func (conn *APIConnection) HasToken() bool {
 	if conn.token == "" {
 		return false
@@ -112,28 +114,38 @@ func (conn *APIConnection) HasToken() bool {
 	return true
 }
 
-func (conn *APIConnection) getToken() string {
+func (conn *APIConnection) getToken() (string, error) {
 	if conn.token == "" {
+		log.Debug("Getting token")
 		postdata := url.Values{}
 		postdata.Add("grant_type", "client_credentials")
-		req, _ := http.NewRequest("POST", identityserver, strings.NewReader(postdata.Encode()))
+		req, err := http.NewRequest("POST", identityserver, strings.NewReader(postdata.Encode()))
+		if err != nil {
+			return "", fmt.Errorf("Failed to create request %w", err)
+		}
 		req.Header.Add("Content-type", "application/x-www-form-urlencoded; charset=utf-8")
 		req.Header.Add("User-Agent", "github.com/elzapp/go-sbanken")
 		req.SetBasicAuth(conn.cred.Apikey, url.QueryEscape(conn.cred.Secret))
 		cli := &http.Client{}
 		resp, err := cli.Do(req)
 		if err != nil {
-			fmt.Printf("%+v", err)
-			return ""
+			return "", fmt.Errorf("Failed to get token: %w", err)
 		}
-		fmt.Printf("%+v", resp)
+		if resp.StatusCode == 400 {
+			return "", fmt.Errorf("Got \"%s\" while requesting token, check that your secret is valid", resp.Status)
+		} else if resp.StatusCode > 399 {
+			return "", fmt.Errorf("Got \"%s\" while requesting token (%+v)", resp.Status, resp)
+		}
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		var t tokenResponse
 		json.Unmarshal(body, &t)
+		if t.Token == "" {
+			log.Errorf("Received empty token from identityserver (%s)", body)
+		}
 		conn.token = t.Token
 	}
-	return conn.token
+	return conn.token, nil
 }
 
 type apirequest struct {
@@ -155,7 +167,11 @@ func (conn *APIConnection) GetAccounts() []Account {
 	r := newAPIRequest()
 	r.target = apiAccounts
 	var a accounts
-	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	resp, err := conn.makeAPIRequest(r)
+	if err != nil {
+		log.Error(err)
+	}
+	json.Unmarshal(resp, &a)
 	return a.Accounts
 }
 
@@ -165,7 +181,8 @@ func (conn *APIConnection) GetTransactions(accountid string) []Transaction {
 	r := newAPIRequest()
 	r.target = fmt.Sprintf(apiTransactions, accountid)
 	var t transactions
-	json.Unmarshal(conn.makeAPIRequest(r), &t)
+	resp, _ := conn.makeAPIRequest(r)
+	json.Unmarshal(resp, &t)
 	return t.Transactions
 }
 
@@ -182,7 +199,8 @@ func (conn *APIConnection) GetTransactionsSince(accountid string, startDate stri
 	r.params["length"] = "1000"
 
 	var t transactions
-	json.Unmarshal(conn.makeAPIRequest(r), &t)
+	resp, _ := conn.makeAPIRequest(r)
+	json.Unmarshal(resp, &t)
 	return t.Transactions
 }
 
@@ -196,9 +214,15 @@ func (conn *APIConnection) GetTransactionsSince(accountid string, startDate stri
 func NewAPIConnection(cred Credentials) APIConnection {
 	var conn APIConnection
 	conn.cred = cred
-	conn.makeAPIRequest = func(r apirequest) []byte {
-		token := conn.getToken()
-		req, _ := http.NewRequest("GET", r.target, nil)
+	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
+		token, err := conn.getToken()
+		if err != nil {
+			return []byte{}, err
+		}
+		req, err := http.NewRequest("GET", r.target, nil)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Failed to create request towards %s (%w)", r.target, err)
+		}
 		req.Header.Add("Authorization", "Bearer "+token)
 		req.Header.Add("User-Agent", "github.com/elzapp/go-sbanken")
 
@@ -206,7 +230,7 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		for key, value := range r.headers {
 			req.Header.Add(key, value)
 		}
-		fmt.Println(req.Header)
+		log.Debugf("Requesting %+v using these headers: %+v", r, req.Header)
 		if len(r.params) > 0 {
 			q := req.URL.Query()
 			for key, value := range r.params {
@@ -218,12 +242,14 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		resp, err := cli.Do(req)
 		if err == nil {
 			defer resp.Body.Close()
-			body, _ := ioutil.ReadAll(resp.Body)
-			fmt.Println(string(body))
-			return body
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return []byte{}, err
+			}
+			return body, nil
 		}
-		fmt.Printf("\n\n%+v %d\n", r, resp.StatusCode)
-		return []byte{}
+		return []byte{}, fmt.Errorf("Unhandled error while requesting {%+v} %w", r, err)
+
 	}
 	return conn
 }

@@ -1,6 +1,10 @@
 package sbanken
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	log "github.com/sirupsen/logrus"
+)
 
 const newEfakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas/new"
 const efakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas"
@@ -46,7 +50,8 @@ func (conn *APIConnection) GetNewEFakturas() []EFaktura {
 	r := newAPIRequest()
 	r.target = newEfakturas
 	var a eFakturaListResponse
-	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	resp, _ := conn.makeAPIRequest(r)
+	json.Unmarshal(resp, &a)
 	return a.Items
 }
 
@@ -55,7 +60,11 @@ func (conn *APIConnection) GetAllEFakturas() []EFaktura {
 	r := newAPIRequest()
 	r.target = efakturas
 	var a eFakturaListResponse
-	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	resp, err := conn.makeAPIRequest(r)
+	if err != nil {
+		log.Error(err)
+	}
+	json.Unmarshal(resp, &a)
 	return a.Items
 }
 
@@ -64,6 +73,7 @@ func (conn *APIConnection) GetEFaktura(eFakturaID string) EFaktura {
 	r := newAPIRequest()
 	r.target = efakturas + "/" + eFakturaID
 	var a eFakturaItemResponse
-	json.Unmarshal(conn.makeAPIRequest(r), &a)
+	resp, _ := conn.makeAPIRequest(r)
+	json.Unmarshal(resp, &a)
 	return a.Item
 }
