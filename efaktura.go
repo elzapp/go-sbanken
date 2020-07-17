@@ -2,10 +2,12 @@ package sbanken
 
 import (
 	"encoding/json"
+
+	log "github.com/sirupsen/logrus"
 )
 
-const newEfakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas/new"
-const efakturas = "https://api.sbanken.no/Bank/api/v1/EFakturas"
+const newEfakturas = "https://api.sbanken.no/exec.bank/api/v1/EFakturas/new"
+const efakturas = "https://api.sbanken.no/exec.bank/api/v1/EFakturas"
 
 // EFaktura as received from the Sbanken public API
 type EFaktura struct {
@@ -59,9 +61,11 @@ func (conn *APIConnection) GetNewEFakturas() ([]EFaktura, error) {
 // GetAllEFakturas returns all pending eFakturas
 func (conn *APIConnection) GetAllEFakturas() ([]EFaktura, error) {
 	r := newAPIRequest()
-	r.target = efakturas
+	r.target = efakturas + "?endDate=2020-08-17T13:14:15.034Z"
 	var a eFakturaListResponse
+	log.Debug("requesting all efakturas")
 	resp, err := conn.makeAPIRequest(r)
+	log.WithFields(log.Fields{"response": resp})
 	if err != nil {
 		return nil, err
 	}
