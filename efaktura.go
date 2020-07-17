@@ -61,7 +61,7 @@ func (conn *APIConnection) GetNewEFakturas() ([]EFaktura, error) {
 // GetAllEFakturas returns all pending eFakturas
 func (conn *APIConnection) GetAllEFakturas() ([]EFaktura, error) {
 	r := newAPIRequest()
-	r.target = efakturas + "?endDate=2020-08-17T13:14:15.034Z"
+	r.target = efakturas
 	var a eFakturaListResponse
 	log.Debug("requesting all efakturas")
 	resp, err := conn.makeAPIRequest(r)
