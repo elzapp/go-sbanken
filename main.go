@@ -244,7 +244,7 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		cli := &http.Client{Timeout: time.Second * 10}
 		resp, err := cli.Do(req)
 		if resp.StatusCode > 399 {
-			return []byte{}, fmt.Errorf("Got \"%s\" while requesting", resp.Status)
+			return []byte{}, fmt.Errorf("Got \"%s\" while requesting {%+v}", resp.Status, r)
 		}
 		if err == nil {
 			defer resp.Body.Close()
