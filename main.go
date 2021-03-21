@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const dateFormat = "2006-01-02T15:04:05-07:00" //2019-03-06T00:00:00+01:00
+const dateFormat = "2006-01-02T15:04:05" //2019-03-06T00:00:00 (used to be 2006-01-02T15:04:05-07:00)
 const identityserver = "https://auth.sbanken.no/identityserver/connect/token"
 const apiAccounts = "https://api.sbanken.no/exec.bank/api/v1/Accounts"
 const apiTransactions = "https://api.sbanken.no/exec.bank/api/v1/Transactions/%s"

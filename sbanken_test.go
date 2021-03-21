@@ -45,8 +45,8 @@ func TestGetTransactions(t *testing.T) {
 			"availableItems": 2,
 			"items": [
 			  {
-				"accountingDate": "2019-10-14T00:00:00+02:00",
-				"interestDate": "2019-10-15T00:00:00+02:00",
+				"accountingDate": "2019-10-14T00:00:00",
+				"interestDate": "2019-10-15T00:00:00",
 				"otherAccountNumberSpecified": false,
 				"amount": -58.000,
 				"text": "*3100 13.10 NOK 58.00 PAYPAL INC Kurs: 1.0000",
@@ -66,14 +66,14 @@ func TestGetTransactions(t *testing.T) {
 					"merchantCity": "4029357733",
 					"merchantName": "PAYPAL *STRAVA INC",
 					"originalCurrencyCode": "NOK",
-					"purchaseDate": "2019-10-13T00:00:00+02:00",
+					"purchaseDate": "2019-10-13T00:00:00",
 					"transactionId": "5892862195085990"
 				},
 				"transactionDetailSpecified": false
 			},
 			{
-				"accountingDate": "2019-10-23T00:00:00+02:00",
-				"interestDate": "2019-10-23T00:00:00+02:00",
+				"accountingDate": "2019-10-23T00:00:00",
+				"interestDate": "2019-10-23T00:00:00",
 				"otherAccountNumberSpecified": false,
 				"amount": -16.410,
 				"text": "23.10 REMA SPECTRUM FOLKE BERNAD FYLLINGSDALEN",
@@ -97,14 +97,14 @@ func TestGetTransactions(t *testing.T) {
 	if len(transactions) != 2 {
 		t.Errorf("Expected number of returned transactions to be 2, got %d", len(transactions))
 	}
-	if transactions[0].AccountingDate != "2019-10-14T00:00:00+02:00" {
-		t.Errorf("Expected accounting date to be 2019-10-14T00:00:00+02:00, got %s", transactions[0].AccountingDate)
+	if transactions[0].AccountingDate != "2019-10-14T00:00:00" {
+		t.Errorf("Expected accounting date to be 2019-10-14T00:00:00, got %s", transactions[0].AccountingDate)
 	}
-	if transactions[0].GetAccountingDate().Unix() != 1571004000 {
-		t.Errorf("Expected accounting date to be %d, got %d", 1571004000, transactions[0].GetAccountingDate().Unix())
+	if transactions[0].GetAccountingDate().Unix() != 1571011200 {
+		t.Errorf("Expected accounting date to be %d, got %d", 1571011200, transactions[0].GetAccountingDate().Unix())
 	}
-	if transactions[0].GetInterestDate().Unix() != 1571090400 {
-		t.Errorf("Expected interest date to be %d, got %d", 1571090400, transactions[0].GetInterestDate().Unix())
+	if transactions[0].GetInterestDate().Unix() != 1571097600 {
+		t.Errorf("Expected interest date to be %d, got %d", 1571097600, transactions[0].GetInterestDate().Unix())
 	}
 	if transactions[0].CardDetails.CardNumber != "*3100" {
 		t.Errorf("Expected cardNumber to be %s, but got %s", "*3100", transactions[0].CardDetails.CardNumber)
