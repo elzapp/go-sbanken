@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -92,6 +94,46 @@ func (t *Transaction) GetInterestDate() time.Time {
 func (t *Transaction) GetAccountingDate() time.Time {
 	r, _ := time.Parse(dateFormat, t.AccountingDate)
 	return r
+}
+
+// GetTransactionDate makes a best effort at getting the actual
+// transction date, that will stay stable across the reservation
+// and the archived Transaction
+func (t *Transaction) GetTransactionDate() time.Time {
+
+	if t.CardDetails.PurchaseDate != "" {
+		r, _ := time.Parse(dateFormat, t.CardDetails.PurchaseDate)
+		return r
+	}
+	if len(t.Text) < 5 {
+		return t.GetAccountingDate()
+	}
+	datepart := t.Text[0:5]
+	if match, _ := regexp.Match(`[0-9]{2}\.[0-9]{2}`, []byte(datepart)); match {
+		d := strings.SplitN(datepart, ".", 2)
+		day, _ := strconv.Atoi(d[0])
+		month, _ := strconv.Atoi(d[1])
+		dd := time.Date(t.GetAccountingDate().Year(), time.Month(month), day, 0, 0, 0, 0, time.UTC)
+		if t.GetAccountingDate().Sub(dd) < time.Duration(0) {
+			dd = dd.AddDate(-1, 0, 0)
+		}
+		return dd
+	}
+
+	return t.GetAccountingDate()
+}
+
+// GetText gets the memo text from the transaction, without the
+// date and value prefix added on card transactions
+func (t *Transaction) GetText() string {
+	if t.CardDetails.MerchantName != "" {
+		return fmt.Sprintf("%s, %s", t.CardDetails.MerchantName, t.CardDetails.MerchantCity)
+	}
+	r := regexp.MustCompile(`^[0-9]{2}.[0-9]{2} (.*)$`)
+	if r.MatchString(t.Text) {
+		return r.FindStringSubmatch(t.Text)[1]
+	}
+	return t.Text
 }
 
 type transactions struct {

@@ -1,7 +1,9 @@
 package sbanken
 
 import (
+	"fmt"
 	"testing"
+	"time"
 )
 
 func TestGetAccounts(t *testing.T) {
@@ -209,5 +211,89 @@ func TestGetSingleEFaktura(t *testing.T) {
 	}
 	if efaktura.IssuerName != "Telenor" {
 		t.Errorf("Expected issuer name to be Telenor, got %s", efaktura.IssuerName)
+	}
+}
+
+func TestGetPurchaseDateWithFallback(t *testing.T) {
+	tx := Transaction{AccountingDate: "2020-03-01T00:00:00"}
+	expect := "2020-03-01"
+	got := tx.GetTransactionDate().Format(time.RFC3339)[0:10]
+	if got != expect {
+		fmt.Printf("Using fallback, got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+func TestGetPurchaseDateFromCardDetails(t *testing.T) {
+	tx := Transaction{AccountingDate: "2020-03-01T00:00:00"}
+
+	tx.CardDetails.PurchaseDate = "2020-03-05T00:00:00"
+	expect := "2020-03-05"
+	got := tx.GetTransactionDate().Format(time.RFC3339)[0:10]
+	if got != expect {
+		fmt.Printf("Using CardDetails, got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
+func TestGetPurchaseDateFromText(t *testing.T) {
+	tx := Transaction{
+		AccountingDate: "2020-03-01T00:00:00",
+		Text:           "28.02 REMA KALMARHUSE JON SMØRSGT  BERGEN",
+	}
+	expect := "2020-02-28"
+	got := tx.GetTransactionDate().Format(time.RFC3339)[0:10]
+	if got != expect {
+		fmt.Printf("Using Text, got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
+func TestGetPurchaseDateFromTextNewyear(t *testing.T) {
+	tx := Transaction{
+		AccountingDate: "2020-01-01T00:00:00",
+		Text:           "31.12 REMA KALMARHUSE JON SMØRSGT  BERGEN",
+	}
+	expect := "2019-12-31"
+	got := tx.GetTransactionDate().Format(time.RFC3339)[0:10]
+	if got != expect {
+		fmt.Printf("Using Text prev year, got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+func TestGetPurchaseDateFromTextSameday(t *testing.T) {
+	tx := Transaction{
+		AccountingDate: "2020-01-01T00:00:00",
+		Text:           "01.01 REMA KALMARHUSE JON SMØRSGT  BERGEN",
+	}
+	expect := "2020-01-01"
+	got := tx.GetTransactionDate().Format(time.RFC3339)[0:10]
+	if got != expect {
+		fmt.Printf("Using Text on same day, got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
+func TestGetText(t *testing.T) {
+	tx := Transaction{
+		Text: "01.01 REMA KALMARHUSE JON SMØRSGT  BERGEN",
+	}
+	expect := "REMA KALMARHUSE JON SMØRSGT  BERGEN"
+	got := tx.GetText()
+	if got != expect {
+		fmt.Printf("Got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
+func TestGetTextCreditCard(t *testing.T) {
+	tx := Transaction{
+		Text:        "*7259 15.03 NOK 67.50 BUNNPRIS SLETTE Kurs: 1.0000",
+		CardDetails: cardDetails{MerchantName: "BUNNPRIS SLETTE", MerchantCity: "BERGEN"},
+	}
+	expect := "BUNNPRIS SLETTE, BERGEN"
+	got := tx.GetText()
+	if got != expect {
+		fmt.Printf("Got %s, expected %s\n", got, expect)
+		t.Fail()
 	}
 }
