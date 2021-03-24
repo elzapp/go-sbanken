@@ -273,6 +273,19 @@ func TestGetPurchaseDateFromTextSameday(t *testing.T) {
 	}
 }
 
+func TestGetPurchaseDateFromTextCreditCardNoDetails(t *testing.T) {
+	tx := Transaction{
+		AccountingDate: "2021-03-23T00:00:00",
+		Text:           "*1234 22.03 NOK 49.30 EXTRA NESTTUN 837625 KURS: 1.0000",
+	}
+	expect := "2021-03-22"
+	got := tx.GetTransactionDate().Format(time.RFC3339)[0:10]
+	if got != expect {
+		fmt.Printf("Using Text on same day, got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
 func TestGetText(t *testing.T) {
 	tx := Transaction{
 		Text: "01.01 REMA KALMARHUSE JON SMØRSGT  BERGEN",
@@ -285,12 +298,48 @@ func TestGetText(t *testing.T) {
 	}
 }
 
+func TestGetTextPayment(t *testing.T) {
+	tx := Transaction{
+		Text: "Til: BONNIER PUBLICA Betalt: 17.03.21",
+	}
+	expect := "BONNIER PUBLICA"
+	got := tx.GetText()
+	if got != expect {
+		fmt.Printf("Got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
+func TestGetTextNettgiro(t *testing.T) {
+	tx := Transaction{
+		Text: "Nettgiro til: BONNIER PUBLICA Betalt: 12.03.21",
+	}
+	expect := "BONNIER PUBLICA"
+	got := tx.GetText()
+	if got != expect {
+		fmt.Printf("Got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
 func TestGetTextCreditCard(t *testing.T) {
 	tx := Transaction{
-		Text:        "*7259 15.03 NOK 67.50 BUNNPRIS SLETTE Kurs: 1.0000",
+		Text:        "*1234 15.03 NOK 67.50 BUNNPRIS SLETTE Kurs: 1.0000",
 		CardDetails: cardDetails{MerchantName: "BUNNPRIS SLETTE", MerchantCity: "BERGEN"},
 	}
 	expect := "BUNNPRIS SLETTE, BERGEN"
+	got := tx.GetText()
+	if got != expect {
+		fmt.Printf("Got %s, expected %s\n", got, expect)
+		t.Fail()
+	}
+}
+
+func TestGetTextCreditCardWithoutCardDetails(t *testing.T) {
+	tx := Transaction{
+		Text: "*1234 22.03 NOK 49.30 EXTRA NESTTUN 837625 KURS: 1.0000",
+	}
+	expect := "EXTRA NESTTUN 837625"
 	got := tx.GetText()
 	if got != expect {
 		fmt.Printf("Got %s, expected %s\n", got, expect)
