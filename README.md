@@ -22,7 +22,7 @@ import {
 	sbanken "github.com/elzapp/go-sbanken"
 }
 func main() {
-	creds := sbanken.Credentials{"MYAPIKEY","MYSECRET","MYSSN"}
+	creds := sbanken.Credentials{"MYAPIKEY","MYSECRET"}
 	conn := sbanken.NewAPIConnection(creds)
 	accounts := conn.GetAccounts()
 
