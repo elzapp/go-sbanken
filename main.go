@@ -16,8 +16,8 @@ import (
 
 const dateFormat = "2006-01-02T15:04:05" //2019-03-06T00:00:00 (used to be 2006-01-02T15:04:05-07:00)
 const identityserver = "https://auth.sbanken.no/identityserver/connect/token"
-const apiAccounts = "https://api.sbanken.no/exec.bank/api/v1/Accounts"
-const apiTransactions = "https://api.sbanken.no/exec.bank/api/v1/Transactions/%s"
+const apiAccounts = "https://publicapi.sbanken.no/apibeta/api/v1/Accounts"
+const apiTransactions = "https://publicapi.sbanken.no/apibeta/api/v1/Transactions/%s"
 
 type accounts struct {
 	Accounts []Account `json:"items"`
@@ -118,6 +118,9 @@ func (t *Transaction) GetTransactionDate() time.Time {
 			dd = dd.AddDate(-1, 0, 0)
 		}
 		return dd
+	}
+	if len(t.Text) < 11 {
+		return t.GetAccountingDate()
 	}
 	datepart = t.Text[6:11]
 	if match, _ := regexp.MatchString(`^\*[0-9]{4} [0-9]{2}\.[0-9]{2}`, t.Text); match {

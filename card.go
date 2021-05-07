@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-const cards = "https://api.sbanken.no/exec.bank/api/v1/Cards"
+const cards = "https://publicapi.sbanken.no/apibeta/api/v1/Cards"
 
 // Card ...
 type Card struct {

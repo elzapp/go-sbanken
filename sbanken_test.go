@@ -180,7 +180,7 @@ func TestGetAllEfakturas(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
 	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
-		if r.target != "https://api.sbanken.no/exec.bank/api/v1/EFakturas" {
+		if r.target != "https://publicapi.sbanken.no/apibeta/api/v1/EFakturas" {
 			t.Errorf("GetAllEFakturas is calling wrong endpoint: %s", r.target)
 		}
 		return []byte(efakturaList), nil
@@ -199,7 +199,7 @@ func TestGetSingleEFaktura(t *testing.T) {
 	var cred Credentials
 	conn := NewAPIConnection(cred)
 	conn.makeAPIRequest = func(r apirequest) ([]byte, error) {
-		if r.target != "https://api.sbanken.no/exec.bank/api/v1/EFakturas/XYZXYZ" {
+		if r.target != "https://publicapi.sbanken.no/apibeta/api/v1/EFakturas/XYZXYZ" {
 			t.Errorf("GetEfaktura is calling wrong endpoint: %s", r.target)
 		}
 		return []byte(singleEFaktura), nil

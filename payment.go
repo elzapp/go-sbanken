@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-const payments = `https://api.sbanken.no/exec.bank/api/v1/Payments/`
+const payments = `https://publicapi.sbanken.no/apibeta/api/v1/Payments/`
 
 // Payment ...
 type Payment struct {

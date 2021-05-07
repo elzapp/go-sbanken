@@ -6,8 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const newEfakturas = "https://api.sbanken.no/exec.bank/api/v1/EFakturas/new"
-const efakturas = "https://api.sbanken.no/exec.bank/api/v1/EFakturas"
+const newEfakturas = "https://publicapi.sbanken.no/apibeta/api/v1/EFakturas/new"
+const efakturas = "https://publicapi.sbanken.no/apibeta/api/v1/EFakturas"
 
 // EFaktura as received from the Sbanken public API
 type EFaktura struct {
