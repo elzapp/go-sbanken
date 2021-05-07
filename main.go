@@ -47,7 +47,6 @@ type errorInformation struct {
 type Credentials struct {
 	Apikey string `json:"apikey"`
 	Secret string `json:"secret"`
-	UserID string `json:"userid"`
 }
 
 type tokenResponse struct {
@@ -293,7 +292,6 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		req.Header.Add("Authorization", "Bearer "+token)
 		req.Header.Add("User-Agent", "github.com/elzapp/go-sbanken")
 
-		req.Header.Add("customerId", conn.cred.UserID)
 		for key, value := range r.headers {
 			req.Header.Add(key, value)
 		}
@@ -307,7 +305,7 @@ func NewAPIConnection(cred Credentials) APIConnection {
 		}
 		cli := &http.Client{Timeout: time.Second * 10}
 		resp, err := cli.Do(req)
-		if resp.StatusCode > 399 {
+		if resp != nil && resp.StatusCode > 399 {
 			return []byte{}, fmt.Errorf("Got \"%s\" while requesting {%+v}", resp.Status, r)
 		}
 		if err == nil {

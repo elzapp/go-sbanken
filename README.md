@@ -114,7 +114,6 @@ Account information
 type Credentials struct {
 	Apikey string `json:"apikey"`
 	Secret string `json:"secret"`
-	UserID string `json:"userid"`
 }
 ```
 
